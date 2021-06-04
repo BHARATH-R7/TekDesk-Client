@@ -1,37 +1,21 @@
+  
 version: 0.2
-
-env:
-    variables:
-        S3_BUCKET: "angularcasestudybucket"
 phases:
-install:
+  install:
     runtime-versions:
-        nodejs: 10
+      nodejs: 12
     commands:
-    - echo $CODEBUILD_SRC_DIR
-    - npm install -y npm@latest
-    - npm install -g @angular/cli
-    - rm package-lock.json
-pre_build:
+      - echo "Installing dependencies..."
+      - npm install
+      - npm install -g @angular/cli@10.0.8
+  build:
     commands:
-    - npm install
-build:
+      - echo "Building Angular project..."
+      - ng build --prod
+  post_build:
     commands:
-    - echo build started on `date`
-    - ng build
-    - ls -l -F
-post_build:
-    commands:
-            # Clear S3 bucket.
+       # Clear S3 bucket.
             - aws s3 rm s3://${S3_BUCKET} --recursive
             - echo S3 bucket is cleared.
-            - aws s3 cp dist/{Your app name} s3://${S3_BUCKET} --recursive
-            - echo Build completed on `date`
-artifacts:
-    files:
-        - '/'
-    discard-paths: yes
-    base-directory: 'dist*'
-
-paths:
-    - node_modules/
+            - aws s3 cp dist/{CASESTUDY} s3://${angularcasestudybucket} --recursive
+           
